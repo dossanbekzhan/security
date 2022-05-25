@@ -2,17 +2,10 @@ package kz.doss.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 @Configuration
 public class CustomPasswordEncoder {
@@ -28,13 +21,13 @@ public class CustomPasswordEncoder {
     }
 
 
-    /**
-     * In-memory user details service
-     *
-     * @param encoder PasswordEncoder
-     * @return UserDetailsService
-     */
-    @Bean
+//    /**
+//     * In-memory user details service
+//     *
+//     * @param encoder PasswordEncoder
+//     * @return UserDetailsService
+//     */
+/*    @Bean
     public UserDetailsService userDetailsService(PasswordEncoder encoder) {
         List<UserDetails> usersList = new ArrayList<>();
         usersList.add(new User(
@@ -44,5 +37,14 @@ public class CustomPasswordEncoder {
                 "zaure", encoder.encode("password"),
                 Collections.singletonList(new SimpleGrantedAuthority("ADMIN"))));
         return new InMemoryUserDetailsManager(usersList);
+    }*/
+
+    @Bean
+    public UserDetailsService userDetailsService(UserRepository userRepo) {
+        return username -> {
+            User user = userRepo.findByUsername(username);
+            if (user != null) return user;
+            throw new UsernameNotFoundException("User '" + username + "' not found");
+        };
     }
 }
