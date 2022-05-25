@@ -3,6 +3,7 @@ package kz.doss.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -14,18 +15,19 @@ public class RegistrationController {
 
 
     @GetMapping("/registration")
-    public String register() {
+    public String register(Model model) {
+        model.addAttribute("user", new User());
         return "registration";
     }
 
     @PostMapping("/registration")
     public String processRegistration(RegistrationRequest request) {
         User user = new User();
-        user.setUsername(request.getLogin());
+        user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         userRepo.save(user);
 
-        return "redirect:/login";
+        return "redirect:/";
     }
 }
